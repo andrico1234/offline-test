@@ -55,12 +55,16 @@ async function fetchAndCache(request) {
 }
 
 worker.addEventListener('fetch', (event) => {
+	// https://web.dev/sw-range-requests/, issues with 'range' headers
 	if (event.request.method !== 'GET' || event.request.headers.has('range')) return;
 
 	const url = new URL(event.request.url);
 
 	// don't try to handle e.g. data: URIs
 	const isHttp = url.protocol.startsWith('http');
+
+	console.log('self', self.location);
+	console.log('url', url);
 	const isDevServerRequest =
 		url.hostname === self.location.hostname && url.port !== self.location.port;
 	const isStaticAsset = url.host === self.location.host && staticAssets.has(url.pathname);
